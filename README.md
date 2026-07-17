@@ -1,4 +1,10 @@
-## Installation
+# YouTubeDiscordPresence Linux
+
+Linux-focused fork of [XFG16/YouTubeDiscordPresence](https://github.com/XFG16/YouTubeDiscordPresence), with a native host for **Linux x64/arm64** and first-class support for **Helium Browser**, Google Chrome, Chromium, and Chrome for Testing.
+
+The browser extension keeps the upstream `YouTubeDiscordPresence` name and protocol for compatibility. Linux packaging, installation, native messaging, and Helium integration are maintained in this fork.
+
+## Installation on Linux
 
 <p align="left">
     <a href="https://chrome.google.com/webstore/detail/youtubediscordpresence/hnmeidgkfcbpjjjpmjmpehjdljlaeaaa" alt="Chrome Extension">
@@ -7,17 +13,11 @@
         <img src="https://img.shields.io/badge/Total%20Installs-71%2C000%2B-blue" /></a>
 </p>
 
-If you've already downloaded the extension, **skip the first step!**
-
-1. Add the [<ins>**Chrome Extension**</ins>](https://chrome.google.com/webstore/detail/youtubediscordpresence/hnmeidgkfcbpjjjpmjmpehjdljlaeaaa) from the Chrome Web Store.
+1. Add the [<ins>**Chrome Extension**</ins>](https://chrome.google.com/webstore/detail/youtubediscordpresence/hnmeidgkfcbpjjjpmjmpehjdljlaeaaa) from the Chrome Web Store, or load this repository's `Extension` directory as an unpacked extension.
 
    - To access personalization settings, click on the extension icon in your browser's extension menu at the top right corner of your browser.
 
-2. Install the secondary desktop component for your operating system.
-
-   - **Windows (x64):** Download the latest `YTDPsetup.msi` file from
-     [**<ins>releases</ins>**](https://github.com/XFG16/YouTubeDiscordPresence/releases) and run it.
-   - **Linux (x64 or arm64):** Build and register the native host for your user:
+2. Build and register the Linux native host for your user:
 
      ```sh
      cd NodeHost
@@ -26,8 +26,8 @@ If you've already downloaded the extension, **skip the first step!**
      npm run install:linux
      ```
 
-     Restart Chrome or Chromium after installation. The installer registers the host in the user-level profiles for
-     Google Chrome, Chrome for Testing, and Chromium; it does not require `sudo`.
+     Restart the browser after installation. The installer registers the host in the user-level profiles for
+     **Helium Browser**, Google Chrome, Chrome for Testing, and Chromium; it does not require `sudo`.
 
      If you loaded the extension unpacked, copy its ID from `chrome://extensions` and install with:
 
@@ -35,20 +35,22 @@ If you've already downloaded the extension, **skip the first step!**
      npm run install:linux -- --extension-id YOUR_32_CHARACTER_EXTENSION_ID
      ```
 
+     Helium's extension ID is available at `helium://extensions`. The installer writes its Native Messaging manifest to `~/.config/net.imput.helium/NativeMessagingHosts` automatically. To install only for Helium, add `--browser helium`.
+
 Still confused? Watch the **installation tutorial** on YouTube using [**<ins>this link</ins>**](https://www.youtube.com/watch?v=BWPNqPGFyL4).
 
 ---
 
-# YouTubeDiscordPresence for Windows and Linux
+# About this fork
 
 <p align="left">
     <a href="https://chrome.google.com/webstore/detail/youtubediscordpresence/hnmeidgkfcbpjjjpmjmpehjdljlaeaaa" alt="Category: Social & Communication">
         <img src="https://img.shields.io/badge/Category-Social%20%26%20Communication-blueviolet" /></a>
-    <a href="https://github.com/XFG16/YouTubeDiscordPresence#license" alt="MIT License">
+    <a href="https://github.com/gnustella-lab/YouTubeDiscordPresence-Linux#license" alt="MIT License">
         <img src="https://img.shields.io/badge/License-MIT-yellow" /></a>
 </p>
 
-**YouTubeDiscordPresence** (YTDP) is an application and browser extension used to create a detailed rich presence for YouTube and YouTube Music on Discord. **Windows (x64)** and **Linux (x64/arm64)** are supported.
+**YouTubeDiscordPresence** (YTDP) is an application and browser extension used to create a detailed rich presence for YouTube and YouTube Music on Discord. This fork targets **Linux (x64/arm64)** and Chromium-family browsers, including **Helium**. For the original project and Windows installer, visit [XFG16/YouTubeDiscordPresence](https://github.com/XFG16/YouTubeDiscordPresence).
 
 <br>
 
@@ -62,6 +64,8 @@ Still confused? Watch the **installation tutorial** on YouTube using [**<ins>thi
 
 - YouTubeDiscordPresence only works with the desktop application of Discord, **not the browser version.**
 
+- Helium is supported through its native messaging profile. When using an unpacked extension, reinstall the host with the extension ID shown at `helium://extensions`.
+
 - Ensure that the `Share my activity` setting under `Activity Privacy` is **turned on.**
 
 - The rich presence may randomly disappear and reappear within a few seconds due to Chrome forcibly unloading and reloading `background.js` in Manifest v3.
@@ -72,7 +76,7 @@ You should try fully closing your browser and Discord (from the system tray), an
 
 ## Bugs, Feature Requests, or Support
 
-Go [here](https://github.com/XFG16/YouTubeDiscordPresence/issues/new/choose) and follow the template!
+For Linux or Helium problems, open an issue in [this fork](https://github.com/gnustella-lab/YouTubeDiscordPresence-Linux/issues/new/choose). For upstream or Windows problems, use the [original project](https://github.com/XFG16/YouTubeDiscordPresence/issues/new/choose).
 
 ---
 
@@ -82,13 +86,9 @@ Desktop application:
 
    - Install dependencies from `NodeHost` with `npm ci`.
    - Run the tests with `npm test`.
-   - Windows: run `npm run compile`, then replace the existing `YTDPwin.exe` in
-     `C:\Program Files\YouTubeDiscordPresence` with the newly compiled one.
    - Linux for the current architecture: run `npm run compile:linux` followed by `npm run install:linux`.
    - Linux cross-targets: use `npm run compile:linux:x64` or `npm run compile:linux:arm64`.
    - Remove the per-user Linux host with `npm run uninstall:linux`.
-
-   - Building the `.msi`: Download **Visual Studio 2026** with the **Microsoft Visual Studio Installer Project** extension. Open `Host\YTDPwin\YTDPsetup\YTDPsetup.vdproj` and build `YTDPsetup`.
 
 Extension:
    - Download the `Extension` directory, compress it into a zip, and load it onto your browser manually.
@@ -102,6 +102,7 @@ Extension:
 
 ## Maintainers
 
+- **gnustella-lab** — Linux and Helium fork
 - **Charles Kim** ([@charleskimbac](https://github.com/charleskimbac))
 
 ---
@@ -114,4 +115,4 @@ Extension:
 
 ## License
 
-Licensed under the [MIT](https://github.com/XFG16/YouTubeDiscordPresence/blob/main/LICENSE.txt) license.
+Licensed under the [MIT](https://github.com/gnustella-lab/YouTubeDiscordPresence-Linux/blob/main/LICENSE.txt) license. Original project copyright and attribution are preserved.

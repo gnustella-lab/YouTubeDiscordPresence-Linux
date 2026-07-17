@@ -18,7 +18,7 @@ Usage: install-linux.sh [options]
 
 Options:
   --extension-id ID  Allow an unpacked/store extension ID.
-  --browser NAME     all, chrome, chromium, or chrome-for-testing (default: all).
+  --browser NAME     all, chrome, chromium, chrome-for-testing, or helium (default: all).
   --host-path PATH   Install a prebuilt native host from PATH.
   --uninstall        Remove the per-user Linux installation.
   -h, --help         Show this help.
@@ -80,7 +80,8 @@ manifest_dirs() {
             printf '%s\n' \
                 "$config_home/google-chrome/NativeMessagingHosts" \
                 "$config_home/chromium/NativeMessagingHosts" \
-                "$config_home/google-chrome-for-testing/NativeMessagingHosts"
+                "$config_home/google-chrome-for-testing/NativeMessagingHosts" \
+                "$config_home/net.imput.helium/NativeMessagingHosts"
             ;;
         chrome)
             printf '%s\n' "$config_home/google-chrome/NativeMessagingHosts"
@@ -90,6 +91,9 @@ manifest_dirs() {
             ;;
         chrome-for-testing)
             printf '%s\n' "$config_home/google-chrome-for-testing/NativeMessagingHosts"
+            ;;
+        helium)
+            printf '%s\n' "$config_home/net.imput.helium/NativeMessagingHosts"
             ;;
         *)
             echo "Unsupported browser: $browser" >&2

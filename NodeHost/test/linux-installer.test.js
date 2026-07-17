@@ -7,7 +7,7 @@ const test = require("node:test");
 
 const installer = path.resolve(__dirname, "../scripts/install-linux.sh");
 
-test("installs and removes user-level Chrome and Chromium manifests", (t) => {
+test("installs and removes user-level Chromium-family and Helium manifests", (t) => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "ytdp-linux-test-"));
     t.after(() => fs.rmSync(root, { recursive: true, force: true }));
 
@@ -23,7 +23,7 @@ test("installs and removes user-level Chrome and Chromium manifests", (t) => {
 
     execFileSync("sh", [installer, "--host-path", fakeHost], { env });
 
-    for (const profile of ["google-chrome", "chromium", "google-chrome-for-testing"]) {
+    for (const profile of ["google-chrome", "chromium", "google-chrome-for-testing", "net.imput.helium"]) {
         const manifestPath = path.join(
             env.XDG_CONFIG_HOME,
             profile,
