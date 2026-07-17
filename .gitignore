@@ -18,6 +18,8 @@ Host/YTDPwin/YTDPsetup/Release
 *.out
 *.zip
 NodeHost/node_modules
+NodeHost/dist/
+graphify-out/
 NodeHost/src/app-linux
 NodeHost/src/app-macos
 test.js

@@ -1,6 +1,7 @@
 // Node.js version of YouTubeDiscordPresence (buttons and no watermark!)
 // MAIN VARIABLE INITIALIZATION
-const { version } = require('./version.json');
+const { version } = require('../package.json');
+const { NativeMessageParser, encodeNativeMessage } = require('./native-messaging');
 
 let rpc = require("discord-rpc");
 
@@ -24,13 +25,7 @@ let clients = [];
 // SEND MESSAGE
 
 function sendNativeVersion() {
-    let dataObject = { nativeVersion: version };
-    let buffer = Buffer.from(JSON.stringify(dataObject));
-    let header = Buffer.alloc(4);
-
-    header.writeUInt32LE(buffer.length, 0);
-    let data = Buffer.concat([header, buffer]);
-    process.stdout.write(data);
+    process.stdout.write(encodeNativeMessage({ nativeVersion: version }));
 }
 
 function sendExtensionMessage(success, message, err = null) {
@@ -45,13 +40,7 @@ function sendExtensionMessage(success, message, err = null) {
         else formattedMessage = `${CEM}: ${message}`;
     }
 
-    let dataObject = { data: formattedMessage };
-    let buffer = Buffer.from(JSON.stringify(dataObject));
-    let header = Buffer.alloc(4);
-
-    header.writeUInt32LE(buffer.length, 0);
-    let data = Buffer.concat([header, buffer]);
-    process.stdout.write(data);
+    process.stdout.write(encodeNativeMessage({ data: formattedMessage }));
 };
 
 // VERIFY DISCORD-RPC PATCH IS APPLIED
@@ -199,19 +188,10 @@ async function discoverAndConnect(shouldLog = true) {
 discoverAndConnect();
 
 // Periodically check for new Discord clients
-setInterval(() => discoverAndConnect(false), 10000);
+const discoveryInterval = setInterval(() => discoverAndConnect(false), 10000);
 
 // // READING DATA FROM BROWSER EXTENSION
 // // REFERENCED FROM: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Native_messaging#app_side
-
-let payloadSize = null;
-let chunks = [];
-
-const sizeHasBeenRead = () => payloadSize !== null;
-const flushChunksQueue = () => {
-    payloadSize = null;
-    chunks.splice(0);
-};
 
 function handleExtensionPayload(json) {
     if (json.jsApplicationType && json.jsApplicationType != currentApplication.type) {
@@ -242,39 +222,39 @@ function handleExtensionPayload(json) {
     }
 }
 
-const processData = () => {
-    const stringData = Buffer.concat(chunks);
-    if (!sizeHasBeenRead()) payloadSize = stringData.readUInt32LE(0);
-
-    if (stringData.length >= (payloadSize + 4)) {
-        const contentWithoutSize = stringData.slice(4, (payloadSize + 4));
-        flushChunksQueue();
-
-        try {
-            const json = JSON.parse(contentWithoutSize);
-            if (json.presenceData == IDLE_MESSAGE) {
-                sendExtensionMessage(true, "CLEAR_REQUEST_RECEIVED");
-                clearPresence();
-            }
-            else if (json.presenceData) {
-                sendExtensionMessage(true, "UPDATE_REQUEST_RECEIVED");
-                handleExtensionPayload(json)
-            }
-            else if (json.getNativeVersion) {
-                sendExtensionMessage(true, "VERSION_REQUEST_RECEIVED");
-                sendNativeVersion();
-            }
-        }
-        catch (err) {
-            sendExtensionMessage(false, "FATAL_RUNTIME_ERROR", err);
-        }
+const parser = new NativeMessageParser((json) => {
+    if (json.presenceData == IDLE_MESSAGE) {
+        sendExtensionMessage(true, "CLEAR_REQUEST_RECEIVED");
+        clearPresence();
     }
-};
-
-process.stdin.on("readable", () => {
-    let chunk = null;
-    while ((chunk = process.stdin.read()) !== null) {
-        chunks.push(chunk);
+    else if (json.presenceData) {
+        sendExtensionMessage(true, "UPDATE_REQUEST_RECEIVED");
+        handleExtensionPayload(json);
     }
-    processData();
+    else if (json.getNativeVersion) {
+        sendExtensionMessage(true, "VERSION_REQUEST_RECEIVED");
+        sendNativeVersion();
+    }
 });
+
+process.stdin.on("data", (chunk) => {
+    try {
+        parser.push(chunk);
+    }
+    catch (err) {
+        sendExtensionMessage(false, "FATAL_RUNTIME_ERROR", err);
+    }
+});
+
+let shuttingDown = false;
+async function shutdown() {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    clearInterval(discoveryInterval);
+    await Promise.allSettled(clients.map(({ client }) => client.destroy()));
+    process.exit(0);
+}
+
+process.stdin.on("end", shutdown);
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

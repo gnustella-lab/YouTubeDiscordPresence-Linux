@@ -47,6 +47,7 @@ body:
       description: What operating system are you using?
       options:
         - Windows
+        - Linux
         - macOS-arm64
     validations:
       required: true

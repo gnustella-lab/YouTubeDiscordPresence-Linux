@@ -13,15 +13,33 @@ If you've already downloaded the extension, **skip the first step!**
 
    - To access personalization settings, click on the extension icon in your browser's extension menu at the top right corner of your browser.
 
-2. Download the latest `YTDPsetup.msi` file in the [**<ins>releases</ins>**](https://github.com/XFG16/YouTubeDiscordPresence/releases) section of this repository and **run it on your device** to install the secondary desktop component.
+2. Install the secondary desktop component for your operating system.
 
-   - **Note:** Only Windows (x64) is currently supported.
+   - **Windows (x64):** Download the latest `YTDPsetup.msi` file from
+     [**<ins>releases</ins>**](https://github.com/XFG16/YouTubeDiscordPresence/releases) and run it.
+   - **Linux (x64 or arm64):** Build and register the native host for your user:
+
+     ```sh
+     cd NodeHost
+     npm ci
+     npm run compile:linux
+     npm run install:linux
+     ```
+
+     Restart Chrome or Chromium after installation. The installer registers the host in the user-level profiles for
+     Google Chrome, Chrome for Testing, and Chromium; it does not require `sudo`.
+
+     If you loaded the extension unpacked, copy its ID from `chrome://extensions` and install with:
+
+     ```sh
+     npm run install:linux -- --extension-id YOUR_32_CHARACTER_EXTENSION_ID
+     ```
 
 Still confused? Watch the **installation tutorial** on YouTube using [**<ins>this link</ins>**](https://www.youtube.com/watch?v=BWPNqPGFyL4).
 
 ---
 
-# YouTubeDiscordPresence for Windows (x64)
+# YouTubeDiscordPresence for Windows and Linux
 
 <p align="left">
     <a href="https://chrome.google.com/webstore/detail/youtubediscordpresence/hnmeidgkfcbpjjjpmjmpehjdljlaeaaa" alt="Category: Social & Communication">
@@ -30,7 +48,7 @@ Still confused? Watch the **installation tutorial** on YouTube using [**<ins>thi
         <img src="https://img.shields.io/badge/License-MIT-yellow" /></a>
 </p>
 
-**YouTubeDiscordPresence** (YTDP) is an application and browser extension used to create a detailed rich presence for YouTube and YouTube Music on Discord. Only **Windows (x64)** is supported, although more operating systems may be supported in the future.
+**YouTubeDiscordPresence** (YTDP) is an application and browser extension used to create a detailed rich presence for YouTube and YouTube Music on Discord. **Windows (x64)** and **Linux (x64/arm64)** are supported.
 
 <br>
 
@@ -61,15 +79,24 @@ Go [here](https://github.com/XFG16/YouTubeDiscordPresence/issues/new/choose) and
 ## Building
 
 Desktop application:
-   - `npm run compile`
-   - Replace the existing `YTDPwin.exe` in `C:\Program Files\YouTubeDiscordPresence` with the newly compiled one.
+
+   - Install dependencies from `NodeHost` with `npm ci`.
+   - Run the tests with `npm test`.
+   - Windows: run `npm run compile`, then replace the existing `YTDPwin.exe` in
+     `C:\Program Files\YouTubeDiscordPresence` with the newly compiled one.
+   - Linux for the current architecture: run `npm run compile:linux` followed by `npm run install:linux`.
+   - Linux cross-targets: use `npm run compile:linux:x64` or `npm run compile:linux:arm64`.
+   - Remove the per-user Linux host with `npm run uninstall:linux`.
 
    - Building the `.msi`: Download **Visual Studio 2026** with the **Microsoft Visual Studio Installer Project** extension. Open `Host\YTDPwin\YTDPsetup\YTDPsetup.vdproj` and build `YTDPsetup`.
 
 Extension:
    - Download the `Extension` directory, compress it into a zip, and load it onto your browser manually.
 
-   - Make sure that the `"allowed_origins"` key in the JSON file involved in [**<ins>native messaging</ins>**](https://developer.chrome.com/docs/apps/nativeMessaging/) contains the extension's ID. This file should be found at `C:\Program Files\YouTubeDiscordPresence` as `main.json`.
+   - Make sure that the `"allowed_origins"` key in the JSON file involved in
+     [**<ins>native messaging</ins>**](https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging)
+     contains the extension's ID. On Windows this is the installed `main.json`; on Linux, pass the ID to
+     `install-linux.sh` with `--extension-id`.
 
 ---
 

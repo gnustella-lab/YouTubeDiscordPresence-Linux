@@ -4,10 +4,16 @@
   "description": "NodeJS version of the YouTubeDiscordPresence desktop component",
   "main": "src/app.js",
   "scripts": {
-    "test": "node src/app.js",
+    "start": "node src/app.js",
+    "test": "node --test",
     "postinstall": "patch-package",
     "precompile": "node scripts/precompile.js",
-    "compile": "npx pkg -t node14-win . -o src/YTDPwin.exe",
+    "compile": "pkg -t node14-win . -o src/YTDPwin.exe",
+    "compile:linux": "node scripts/precompile.js && pkg --no-bytecode -t node22-linux . -o dist/ytdp-native-host",
+    "compile:linux:x64": "node scripts/precompile.js && pkg --no-bytecode -t node22-linux-x64 . -o dist/ytdp-native-host",
+    "compile:linux:arm64": "node scripts/precompile.js && pkg --no-bytecode -t node22-linux-arm64 . -o dist/ytdp-native-host",
+    "install:linux": "sh scripts/install-linux.sh",
+    "uninstall:linux": "sh scripts/install-linux.sh --uninstall",
     "postcompile": "node scripts/postcompile.js",
     "postversion": "echo also update version in `background.js`, `manifest.json`, and when building!"
   },
@@ -17,9 +23,15 @@
     "discord-rpc": "^4.0.1"
   },
   "bin": "src/app.js",
+  "pkg": {
+    "scripts": [
+      "src/**/*.js",
+      "node_modules/discord-rpc/**/*.js"
+    ]
+  },
   "devDependencies": {
+    "@yao-pkg/pkg": "^6.21.0",
     "patch-package": "^8.0.1",
-    "pkg": "^5.8.1",
     "resedit-cli": "^3.0.1"
   }
 }
